@@ -1,0 +1,30 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Dépendances et builds
+node_modules/
+vendor/
+dist/
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+
+# Laravel
+optiplus/backend/storage/*.key
+optiplus/backend/storage/logs/*
+optiplus/backend/storage/framework/cache/data/*
+optiplus/backend/storage/framework/sessions/*
+optiplus/backend/storage/framework/views/*
+optiplus/backend/database/database.sqlite
+optiplus/backend/public/storage
+
+# Divers
+.DS_Store
+Thumbs.db
+*.log
