@@ -88,7 +88,7 @@ class ChatService
                 'status' => $result->pending ? 'waiting' : 'done',
             ]);
         } catch (LlmException $e) {
-            $assistant->update(['content' => $e->getMessage(), 'status' => 'error']);
+            $assistant->update(['content' => $e->messageFor($user), 'status' => 'error']);
         } catch (\Throwable $e) {
             Log::error($e);
             $assistant->update(['content' => 'Une erreur est survenue. Réessayez dans un instant.', 'status' => 'error']);

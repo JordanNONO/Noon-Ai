@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agents\ChatService;
+use App\Billing\Quota;
 use App\Http\Controllers\Concerns\StreamsEvents;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -82,6 +83,9 @@ class ConversationController extends Controller
             $data['audio_path'] = Storage::disk('local')->exists($path) ? $path : null;
         }
         $user = $request->user();
+        if ($block = Quota::messageBlock($user)) {
+            return response()->json(['message' => $block, 'code' => 'quota'], 402);
+        }
 
         return $this->sse(fn ($emit) => $chat->send($user, $conversation, $data, $emit));
     }
@@ -92,6 +96,9 @@ class ConversationController extends Controller
         $conv = $message->conversation;
         $this->own($request, $conv);
         abort_unless($message->role === 'assistant', 422);
+        if ($block = Quota::messageBlock($request->user())) {
+            return response()->json(['message' => $block, 'code' => 'quota'], 402);
+        }
         $userMsg = $conv->messages()->where('role', 'user')->where('id', '<', $message->id)->reorder('id', 'desc')->firstOrFail();
         $data = ['content' => $userMsg->content, 'agent_id' => $message->agent_id];
         $message->delete();

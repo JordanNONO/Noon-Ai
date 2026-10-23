@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Billing\Quota;
 use App\Models\Language;
 use App\Support\SpeechClient;
 use Illuminate\Http\Request;
@@ -11,12 +12,29 @@ use Illuminate\Support\Str;
 /** Voix en langues bamiléké, via le service vocal. Le français et l'anglais passent par l'appareil. */
 class SpeechController extends Controller
 {
+    /** La voix en langue bamiléké est un avantage des offres payantes (quelques essais par jour en gratuit). */
+    private function voiceBlock(Request $request, string $code): ?string
+    {
+        if (! Language::find($code)?->isLocalLanguage()) {
+            return null;
+        }
+        $block = Quota::voiceBlock($request->user());
+        if (! $block) {
+            Quota::countVoice($request->user());
+        }
+
+        return $block;
+    }
+
     public function transcribe(Request $request, SpeechClient $speech)
     {
         $data = $request->validate([
             'audio' => 'required|file|max:20480',
             'language' => 'required|string|exists:languages,code',
         ]);
+        if ($block = $this->voiceBlock($request, $data['language'])) {
+            return response()->json(['message' => $block, 'code' => 'quota'], 402);
+        }
         $name = Str::uuid().'.'.($request->file('audio')->getClientOriginalExtension() ?: 'webm');
         $path = $request->file('audio')->storeAs('voice/'.$request->user()->id, $name, 'local');
 
@@ -39,6 +57,9 @@ class SpeechController extends Controller
             'text' => 'required|string|max:3000',
             'language' => 'required|string|exists:languages,code',
         ]);
+        if ($block = $this->voiceBlock($request, $data['language'])) {
+            return response()->json(['message' => $block, 'code' => 'quota'], 402);
+        }
         try {
             $wav = $speech->synthesize($data['text'], $data['language']);
         } catch (\Throwable $e) {

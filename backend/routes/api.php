@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\BootstrapController;
 use App\Http\Controllers\ComboController;
 use App\Http\Controllers\ConnectorController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/options', [AuthController::class, 'options']);
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/billing/stripe/webhook', [BillingController::class, 'stripeWebhook']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -73,6 +75,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/knowledge/{entry}', [KnowledgeController::class, 'destroy']);
     Route::get('/knowledge/{entry}/audio', [KnowledgeController::class, 'audio']);
 
+    // Offres et paiements
+    Route::get('/billing', [BillingController::class, 'index']);
+    Route::post('/billing/checkout', [BillingController::class, 'checkout']);
+    Route::post('/billing/payments/{payment}/cancel', [BillingController::class, 'cancelPayment']);
+
     // Connecteurs et modèles : lecture pour tous
     Route::get('/connectors', [ConnectorController::class, 'index']);
     Route::get('/models', [ModelController::class, 'index']);
@@ -102,6 +109,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/admin/groups/{group}', [AdminController::class, 'destroyGroup']);
         Route::get('/admin/settings', [AdminController::class, 'settings']);
         Route::put('/admin/settings', [AdminController::class, 'updateSettings']);
+
+        Route::get('/admin/billing', [BillingController::class, 'adminIndex']);
+        Route::put('/admin/billing/settings', [BillingController::class, 'updateSettings']);
+        Route::put('/admin/plans/{plan}', [BillingController::class, 'updatePlan']);
+        Route::post('/admin/payments/{payment}/validate', [BillingController::class, 'validatePayment']);
+        Route::post('/admin/payments/{payment}/reject', [BillingController::class, 'rejectPayment']);
 
         Route::get('/usage', [UsageController::class, 'index']);
         Route::get('/usage/export', [UsageController::class, 'export']);

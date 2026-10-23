@@ -102,7 +102,7 @@ class ComboRunner
         } catch (\Throwable $e) {
             Log::warning($e);
             $run->update(['status' => 'failed']);
-            $text = $e instanceof LlmException ? $e->getMessage() : 'Le parcours s\'est interrompu. Réessayez dans un instant.';
+            $text = $e instanceof LlmException ? $e->messageFor($user) : 'Le parcours s\'est interrompu. Réessayez dans un instant.';
 
             return $this->finish($msg, $text, null, $cards, $document, $tokensIn, $tokensOut, $modelId, 'error', $emit);
         }

@@ -25,9 +25,10 @@ class Language extends Model
         'experimental' => 'Expérimental',
     ];
 
-    public function isBamileke(): bool
+    /** Langue locale (bamiléké ou autre langue du Cameroun) : voix gérée par le service vocal de Noon. */
+    public function isLocalLanguage(): bool
     {
-        return $this->family === 'bamileke';
+        return $this->family !== 'international';
     }
 
     public static function nameOf(?string $code): string

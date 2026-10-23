@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Billing\Quota;
 use App\Models\Agent;
 use App\Models\AiModel;
 use App\Models\Combo;
@@ -40,6 +41,7 @@ class BootstrapController extends Controller
             'recent' => $conversations->map->toSummary()->values(),
             'favorite_combos' => Combo::where('is_favorite', true)->limit(6)->get()->map->toPublic()->values(),
             'speech' => ['online' => $speech->capabilities()['online']],
+            'quota' => Quota::summary($user),
         ];
     }
 }

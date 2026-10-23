@@ -26,6 +26,11 @@ class LanguageSeeder extends Seeder
             ['xmg', 'Mengaka', null, 'bamileke', 'experimental'],
             ['nla', 'Ngombale', null, 'bamileke', 'experimental'],
             ['jgo', 'Ngomba', null, 'bamileke', 'experimental'],
+            // Autres langues du Cameroun
+            ['dua', 'Duala', 'Duálá', 'cameroun', 'experimental'],
+            ['ewo', 'Ewondo', 'Ewondo', 'cameroun', 'experimental'],
+            ['bas', 'Bassa', 'Ɓasaá', 'cameroun', 'experimental'],
+            ['fub', 'Fulfulde', 'Fulfulde', 'cameroun', 'experimental'],
         ];
         foreach ($langs as $i => [$code, $name, $native, $family, $quality]) {
             Language::updateOrCreate(['code' => $code], [

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agents\ComboRunner;
+use App\Billing\Quota;
 use App\Http\Controllers\Concerns\StreamsEvents;
 use App\Models\Agent;
 use App\Models\Combo;
@@ -71,6 +72,9 @@ class ComboController extends Controller
         abort_if($combo->steps()->doesntExist(), 422, 'Ce parcours n\'a aucune étape.');
         $input = $request->validate(['input' => 'nullable|string|max:20000'])['input'] ?? null;
         $user = $request->user();
+        if ($block = Quota::messageBlock($user)) {
+            return response()->json(['message' => $block, 'code' => 'quota'], 402);
+        }
 
         return $this->sse(fn ($emit) => $runner->start($combo, $user, $input, $emit));
     }

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             LanguageSeeder::class,
+            PlanSeeder::class,
             ModelSeeder::class,
             ConnectorSeeder::class,
         ]);

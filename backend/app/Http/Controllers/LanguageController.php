@@ -17,7 +17,7 @@ class LanguageController extends Controller
 
         return Language::where('is_active', true)->orderBy('sort')->get()->map(function (Language $l) use ($caps) {
             $data = $l->toPublic();
-            $device = ! $l->isBamileke();
+            $device = ! $l->isLocalLanguage();
             $data['speech_to_text'] = $device || in_array($l->code, $caps['stt'], true);
             $data['text_to_speech'] = $device || in_array($l->code, $caps['tts'], true);
             $data['speech_engine'] = $device ? 'device' : 'service';

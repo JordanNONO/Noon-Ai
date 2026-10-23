@@ -2,7 +2,9 @@
 
 namespace App\Llm;
 
+use App\Billing\Quota;
 use App\Models\Agent;
+use App\Models\User;
 use App\Models\AiModel;
 use App\Models\RoutingRule;
 use App\Models\Setting;
@@ -15,14 +17,17 @@ use Illuminate\Support\Collection;
 class ModelRouter
 {
     /** @return Collection<int, AiModel> */
-    public function candidates(?Agent $agent, ?int $explicitModelId = null, bool $advanced = false): Collection
+    public function candidates(?Agent $agent, ?int $explicitModelId = null, bool $advanced = false, ?User $user = null): Collection
     {
         $rule = RoutingRule::where('category', $agent?->category ?? 'general')->first();
         $localOnly = (bool) $rule?->local_only;
+        // Les modèles payants sont réservés aux offres qui les incluent
+        $premium = ! $user || $user->isAdmin() || Quota::plan($user)->premium_models;
 
         $pool = AiModel::where('is_enabled', true)->orderBy('priority')->get()
             ->filter(fn (AiModel $m) => $m->isConfigured())
             ->filter(fn (AiModel $m) => ! $localOnly || $m->isLocal())
+            ->filter(fn (AiModel $m) => $premium || $m->family !== 'paid')
             ->values();
 
         if ($pool->isEmpty()) {

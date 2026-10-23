@@ -42,7 +42,7 @@ class LlmGateway
             }
         }
 
-        throw new LlmException("Aucun modèle n'a pu répondre. ".implode(' · ', $errors));
+        throw new LlmException('Noon n\'arrive pas à réfléchir pour le moment : ses modèles d\'IA ne répondent pas. Réessayez dans un instant.', 0, implode(' · ', $errors));
     }
 
     /** Le contenu natif d'un fournisseur ne sert qu'à ce même fournisseur. */

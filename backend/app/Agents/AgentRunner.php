@@ -33,11 +33,11 @@ class AgentRunner
     {
         $belt = new ToolBelt($agent, $user, $conv, $opt['connector_ids'] ?? null);
         $tools = $belt->definitions();
-        $candidates = $this->router->candidates($agent, $opt['model_id'] ?? null, $opt['advanced'] ?? false);
+        $candidates = $this->router->candidates($agent, $opt['model_id'] ?? null, $opt['advanced'] ?? false, $user);
         $language = Language::find($opt['language'] ?? $conv->language ?? $user->language ?? 'fr') ?? Language::find('fr');
 
         // Savoirs validés pertinents, fournis d'office : même un modèle sans outils en profite
-        $preloaded = ToolBelt::searchKnowledge($input, $language?->isBamileke() ? $language->code : null);
+        $preloaded = ToolBelt::searchKnowledge($input, $language?->isLocalLanguage() ? $language->code : null);
         $belt->sourceIds = $preloaded->pluck('id')->all();
         $system = $this->systemPrompt($agent, $user, $belt, $language, $preloaded, $opt['extra_system'] ?? '');
 
@@ -180,7 +180,7 @@ TXT);
         if (! $language || $language->code === 'fr') {
             return "- Répondez en français. Si la personne écrit dans une autre langue, répondez dans sa langue.";
         }
-        if (! $language->isBamileke()) {
+        if (! $language->isLocalLanguage()) {
             return "- Répondez en {$language->name}.";
         }
         $native = $language->native_name ? " ({$language->native_name})" : '';
