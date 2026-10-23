@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "noon-api",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["C:/Users/user/Desktop/Noon-Ai/backend/artisan", "serve", "--host=127.0.0.1", "--port=8000"],
+      "port": 8000
+    },
+    {
+      "name": "noon-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:/Users/user/Desktop/Noon-Ai/frontend", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "port": 5173
+    }
+  ]
+}
